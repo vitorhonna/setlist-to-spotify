@@ -1,19 +1,21 @@
 import requests
 import json
+from dotenv import load_dotenv
 import os
+
 print()
 
 # https://api.setlist.fm/rest/1.0/search/setlists?artistName=jao&artistMbid=6797c795-08b4-4da2-a4d8-95a554c2a91c&cityName=araraquara
 
-
 def get_setlists(numberOfSetlists, artistMbid, artistName='', cityName=''):
-
     domain = 'api.setlist.fm'
-
     path_setlists = '/rest/1.0/search/setlists'
+
+    load_dotenv()
+
     headers = {
         'Accept': 'application/json',
-        'x-api-key': os.getenv('SETLISTFM_API_KEY'),
+        'x-api-key': os.environ['SETLISTFM_API_KEY'],
     }
 
     payload = {
@@ -54,3 +56,9 @@ def get_setlists(numberOfSetlists, artistMbid, artistName='', cityName=''):
 
     else:
         print(f'\nErro {r.status_code} :(')
+
+
+def get_artist_info(artistName):
+    # TODO
+    # Given an artist name, return the n first results with artists names and Mbid
+    pass
