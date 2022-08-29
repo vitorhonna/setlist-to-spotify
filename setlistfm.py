@@ -1,17 +1,12 @@
-from re import A
 import requests
 import json
 from dotenv import load_dotenv
 import os
 from tabulate import tabulate
 
-print()
-
-# https://api.setlist.fm/rest/1.0/search/setlists?artistName=jao&artistMbid=6797c795-08b4-4da2-a4d8-95a554c2a91c&cityName=araraquara
+load_dotenv()
 
 domain = 'api.setlist.fm/rest'
-
-load_dotenv()
 
 headers = {
     'Accept': 'application/json',
@@ -19,13 +14,11 @@ headers = {
 }
 
 
-def get_setlists(numberOfSetlists, artistMbid, artistName='', cityName=''):
+def get_setlists(numberOfSetlists, minSetlistSize, artistMbid, artistName='', cityName=''):
     path = '/1.0/search/setlists'
 
     payload = {
-        'artistName': artistName,
         'artistMbid': artistMbid,
-        'cityName': cityName,
     }
 
     r = requests.get(
@@ -40,7 +33,6 @@ def get_setlists(numberOfSetlists, artistMbid, artistName='', cityName=''):
     if r.ok:
         response = r.json()
         setlists_json = response['setlist']
-        # print(setlists_json)
         numberOfSetlists = numberOfSetlists if numberOfSetlists < len(
             setlists_json) else len(setlists_json)
 
@@ -49,14 +41,12 @@ def get_setlists(numberOfSetlists, artistMbid, artistName='', cityName=''):
         for i in range(numberOfSetlists):
             setlist = setlists_json[int(i)]
 
-            if len(setlist['sets']['set']) > 0 and len(setlist['sets']['set'][0]['song']) > 10:
+            if len(setlist['sets']['set']) > 0 and len(setlist['sets']['set'][0]['song']) > minSetlistSize:
                 if len(setlist['sets']['set']) == 1:
                     songs = setlist['sets']['set'][0]['song']
                 else:
                     songs = setlist['sets']['set'][0]['song'] + \
                         setlist['sets']['set'][1]['song']
-                # print(songs)
-                # prettyPrint(songs)
 
                 for song in songs:
                     songs.insert(0, songs.pop()['name'])
@@ -66,7 +56,7 @@ def get_setlists(numberOfSetlists, artistMbid, artistName='', cityName=''):
         return setlists
 
     else:
-        print(f'\nErro {r.status_code}')
+        print(f'\nError: {r.status_code}')
 
 
 def get_artist_info(artistName):
@@ -85,7 +75,8 @@ def get_artist_info(artistName):
 
     if r.ok:
         response = r.json()
-        numberOfResults = response['total'] if response['total'] < 5 else 5
+        numberOfResultsToShow = 3
+        numberOfResults = response['total'] if response['total'] < numberOfResultsToShow else numberOfResultsToShow
         artists_raw = response['artist']
         artists = []
 
@@ -99,7 +90,6 @@ def get_artist_info(artistName):
             else:
                 break
 
-        # print(artists)
         table = tabulate(artists,
                          headers='keys',
                          tablefmt='fancy_grid'
@@ -109,4 +99,4 @@ def get_artist_info(artistName):
         return artists
 
     else:
-        print(f'\nErro {r.status_code}')
+        print(f'\nError: {r.status_code}')
