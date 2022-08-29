@@ -1,18 +1,42 @@
 import setlistfm
 import utils
+from tabulate import tabulate
+
 
 def main():
+
+    artist_name = input("Enter artist name: ")
+
+    artists = setlistfm.get_artist_info(artistName=artist_name)
+    artist_id = int(input('\nEnter artist id: '))
+    artist_mbid = artists[artist_id-1]['mbid']
+
     setlists = setlistfm.get_setlists(
-        3, 
-        '6797c795-08b4-4da2-a4d8-95a554c2a91c', 
-        artistName='jao', 
+        numberOfSetlists=10,
+        artistMbid=artist_mbid,
+        artistName='',
         cityName='')
 
-    songs_popularity = utils.calculate_popularity(setlists)
+    if not setlists:
+        print('\nNo setlists found :(')
+        return
 
-    # for setlist in setlists:
-    #     print(setlist)
-    #     utils.calculate_popularity(setlist)
+    songsScore = utils.calculate_songs_score(setlists)
+
+    finalSetlist = utils.build_final_setlist(songsScore)
+    print(finalSetlist)
+    print(len(finalSetlist))
+
 
 if __name__ == '__main__':
     main()
+
+
+# avril = ['Girlfriend',
+#          'Bite Me',
+#          'What the Hell',
+#          'Complicated',
+#          'My Happy Ending',
+#          'Love It When You Hate Me',
+#          'Sk8er Boi',
+#          "I'm With You"]

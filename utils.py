@@ -5,76 +5,73 @@ def checkIfSongIsInList(songName, list):
     return [False, None]
 
 
-def calculate_popularity(setlists):
-    # print(setlists)
-
+def calculate_songs_score(setlists):
     class Song:
-        def __init__(self, name, relativePopularity):
+        def __init__(self, name, score):
             self.name = name
-            self.count = 1
-            self.relativePopularity = relativePopularity
+            self.score = score
 
-        def updateCount(self):
-            self.count = self.count + 1
+        def updateScore(self, relativeScore):
+            self.score = (
+                self.score+relativeScore)/2
 
-        def updateRelativePopularity(self, newRelativePopularity):
-            self.relativePopularity = (
-                self.relativePopularity+newRelativePopularity)/2
-
-        def calculatePopularity(self):
-            popularity = self.relativePopularity / self.count
-            print(round(popularity, 2))
-            return popularity
+        def getJson(self):
+            return {
+                "name": self.name,
+                "score": self.score,
+            }
 
         def lookInside(self):
-            print(f'{self.name}, {self.count}, {round(self.relativePopularity, 2)}')
+            print(f'{self.name}, {round(self.score, 2)}')
 
-    songsPopularity = []
+    songsScore = []
 
     for setlistPosition, setlist in enumerate(setlists):
-        print(setlist)
-        print('='*50)
         for songPositionInSetlist, songName in enumerate(setlist):
             songName = songName.lower()
 
             [songIsInList, index] = checkIfSongIsInList(
-                songName, songsPopularity)
+                songName, songsScore)
 
             if songIsInList:
-                # print(f'{songName} SIM, posicao {index}')
-                song = songsPopularity[index]
-                relativePopularity = (songPositionInSetlist+1) / len(setlist)
-                song.updateRelativePopularity(relativePopularity)
-                song.updateCount()
+                song = songsScore[index]
+                relativeScore = (songPositionInSetlist+1) / len(setlist)
+                song.updateScore(relativeScore)
             else:
-                # print(f'{songName} NAO')
-                relativePopularity = (songPositionInSetlist+1) / len(setlist)
-                song = Song(songName, relativePopularity)
-                songsPopularity.append(song)
+                relativeScore = (songPositionInSetlist+1) / len(setlist)
+                song = Song(songName, relativeScore)
+                songsScore.append(song)
 
-    for song in songsPopularity: 
-        song.lookInside()
-        # song.calculatePopularity()
+    songsScore_dicts = []
 
-            # print(songPositionInSetlist+1, song.name)
+    for song in songsScore:
+        songsScore_dicts.append(song.getJson())
 
-    # EXPECTED OUTPUT STRUCTURE
+    # EXPECTED OUTPUT
     # songs_info = [
     #     {
     #         'name': 'clarão',
-    #         'relativePopularity': 0.01,
-    #         'count': 3,
+    #         'relativePopularity': 0.01
     #     },
     #     {
     #         'name': 'meninos e meninas',
-    #         'relativePopularity': 0.50,
-    #         'count': 3,
+    #         'relativePopularity': 0.50
     #     },
     #     {
     #         'name': 'idiota',
-    #         'relativePopularity': 0.99,
-    #         'count': 3,
+    #         'relativePopularity': 0.99
     #     },
     # ]
 
-    return songsPopularity
+    return songsScore_dicts
+
+
+def build_final_setlist(songsScore_dicts):
+    songsScore_dicts.sort(key=lambda x: x['score'])
+
+    finalSetlist = []
+
+    for songsScore_dict in songsScore_dicts:
+        finalSetlist.append(songsScore_dict['name'])
+
+    return finalSetlist
