@@ -6,8 +6,8 @@ import spotify
 
 print()
 
-# Generate spotify token here
-# https://developer.spotify.com/console/get-current-user/
+# Generate spotify token here (SPOTIFY_TOKEN)
+# https://developer.spotify.com/console/post-playlists/
 
 
 def main():
