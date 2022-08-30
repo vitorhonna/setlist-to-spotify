@@ -30,8 +30,9 @@ def get_setlists(numberOfSetlists, minSetlistSize, artistMbid, artistName='', ci
     def prettyPrint(response):
         print(json.dumps(response, indent=2))
 
+    response = r.json()
+
     if r.ok:
-        response = r.json()
         setlists_json = response['setlist']
         numberOfSetlists = numberOfSetlists if numberOfSetlists < len(
             setlists_json) else len(setlists_json)
@@ -56,7 +57,8 @@ def get_setlists(numberOfSetlists, minSetlistSize, artistMbid, artistName='', ci
         return setlists
 
     else:
-        print(f'\nError: {r.status_code}')
+        print(
+            f"Error {response['error']['status']}: {response['error']['message']}")
 
 
 def get_artist_info(artistName):
@@ -73,8 +75,9 @@ def get_artist_info(artistName):
         params=payload
     )
 
+    response = r.json()
+
     if r.ok:
-        response = r.json()
         numberOfResultsToShow = 3
         numberOfResults = response['total'] if response['total'] < numberOfResultsToShow else numberOfResultsToShow
         artists_raw = response['artist']
@@ -99,4 +102,5 @@ def get_artist_info(artistName):
         return artists
 
     else:
-        print(f'\nError: {r.status_code}')
+        print(
+            f"Error {response['error']['status']}: {response['error']['message']}")
